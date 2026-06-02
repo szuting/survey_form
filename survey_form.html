@@ -114,6 +114,49 @@
     text-align: center;
     margin-bottom: 20px;
   }
+
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+  }
+
+  button.submit-btn {
+    background: #f5a0a0;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 40px;
+    font-size: 17px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(245,160,160,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: 1px;
+  }
+
+  button.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(245,160,160,0.5);
+  }
+
+  button.submit-btn:active { transform: scale(0.97); }
+
+  .success-msg {
+    display: none;
+    background: #fff0f5;
+    border: 1.5px solid #f5a0a0;
+    border-radius: 16px;
+    padding: 14px 24px;
+    font-size: 14px;
+    color: #c06060;
+    text-align: center;
+    max-width: 420px;
+  }
 </style>
 </head>
 <body>
@@ -156,66 +199,69 @@
   <img src="S__96526355_0.jpg" alt="謝謝你的分享！">
 </div>
 
-<div class="btn-wrap">
-  <button class="download-btn" onclick="downloadHTML()">⬇ 下載儲存問卷</button>
+<div class="btn-group">
+  <button class="submit-btn" id="submit-btn" onclick="submitSurvey()">📨 送出問卷</button>
+  <div class="success-msg" id="success-msg">🎉 答案已成功送出到 Google 試算表！謝謝你的分享 ♡</div>
+  <div class="success-msg" id="error-msg" style="border-color:#e08080;background:#fff5f5;color:#c05050;">❌ 送出失敗，請檢查網路後再試一次。</div>
 </div>
 
 <script>
-function downloadHTML() {
-  const answers = {
-    q1: document.getElementById('q1-box').value,
-    q2: document.getElementById('q2-box').value,
-    q3: document.getElementById('q3-box').value,
-    q4: document.getElementById('q4-box').value,
-    q5: document.getElementById('q5-box').value,
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyobaJQLglClIved1ESectzHshSuhXtibYSAhxPLExPcELPAuDknpIHcfxJK6BNgW1nyA/exec';
+
+const QUESTIONS = [
+  '1. 最近最喜歡做的工作內容是什麼？',
+  '2. 有沒有什麼事情是你想嘗試的？',
+  '3. 有沒有什麼技能是你想培養的？',
+  '4. 工作上目前有沒有卡關或需要協助的地方？',
+  '5. 還有什麼想跟我分享的？',
+];
+
+async function submitSurvey() {
+  const btn = document.getElementById('submit-btn');
+  const successMsg = document.getElementById('success-msg');
+  const errorMsg = document.getElementById('error-msg');
+
+  const vals = [
+    document.getElementById('q1-box').value,
+    document.getElementById('q2-box').value,
+    document.getElementById('q3-box').value,
+    document.getElementById('q4-box').value,
+    document.getElementById('q5-box').value,
+  ];
+
+  const time = new Date().toLocaleString('zh-TW');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ 送出中…';
+  successMsg.style.display = 'none';
+  errorMsg.style.display = 'none';
+
+  const payload = {
+    fill_time: time,
+    q1: vals[0] || '（未填寫）',
+    q2: vals[1] || '（未填寫）',
+    q3: vals[2] || '（未填寫）',
+    q4: vals[3] || '（未填寫）',
+    q5: vals[4] || '（未填寫）',
   };
 
-  const questions = [
-    '1. 最近最喜歡做的工作內容是什麼？',
-    '2. 有沒有什麼事情是你想嘗試的？',
-    '3. 有沒有什麼技能是你想培養的？',
-    '4. 工作上目前有沒有卡關或需要協助的地方？',
-    '5. 還有什麼想跟我分享的？',
-  ];
-  const vals = [answers.q1, answers.q2, answers.q3, answers.q4, answers.q5];
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
 
-  const rows = questions.map((q, i) => `
-    <div style="margin-bottom:28px;">
-      <div style="font-size:16px;font-weight:700;color:#d47b7b;margin-bottom:8px;">${q}</div>
-      <div style="background:#fff0f0;border-radius:12px;padding:14px 16px;font-size:15px;color:#4a3f3f;min-height:60px;white-space:pre-wrap;line-height:1.7;">${escapeHtml(vals[i]) || '<span style="color:#c9a8a8;">（未填寫）</span>'}</div>
-    </div>
-  `).join('');
+    btn.textContent = '✅ 已送出！';
+    btn.style.background = '#88c98a';
+    successMsg.style.display = 'block';
 
-  const html = `<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-<meta charset="UTF-8">
-<title>問卷回覆 - 團隊問卷調查</title>
-<style>
-  body{font-family:'Noto Sans TC',sans-serif;background:#fff8f5;padding:32px 20px;max-width:600px;margin:0 auto;}
-  h1{font-size:22px;font-weight:700;color:#d47b7b;text-align:center;margin-bottom:8px;}
-  .sub{font-size:13px;color:#b08080;text-align:center;margin-bottom:32px;}
-  .footer{text-align:center;color:#c9a8a8;font-size:12px;margin-top:40px;}
-</style>
-</head>
-<body>
-<h1>✨ 團隊問卷調查 — 回覆記錄 ✨</h1>
-<p class="sub">填寫時間：${new Date().toLocaleString('zh-TW')}</p>
-${rows}
-<div class="footer">謝謝你的分享！期待未來一起創造更多美好成果 ♡</div>
-</body>
-</html>`;
-
-  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = '問卷回覆.html';
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-function escapeHtml(str) {
-  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = '📨 送出問卷';
+    errorMsg.style.display = 'block';
+  }
 }
 </script>
 </body>
