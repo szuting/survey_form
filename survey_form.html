@@ -114,49 +114,6 @@
     text-align: center;
     margin-bottom: 20px;
   }
-
-  .btn-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    margin-top: 8px;
-    margin-bottom: 12px;
-  }
-
-  button.submit-btn {
-    background: #f5a0a0;
-    color: white;
-    border: none;
-    border-radius: 50px;
-    padding: 14px 40px;
-    font-size: 17px;
-    font-family: 'Noto Sans TC', sans-serif;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(245,160,160,0.4);
-    transition: transform 0.15s, box-shadow 0.15s;
-    letter-spacing: 1px;
-  }
-
-  button.submit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(245,160,160,0.5);
-  }
-
-  button.submit-btn:active { transform: scale(0.97); }
-
-  .success-msg {
-    display: none;
-    background: #fff0f5;
-    border: 1.5px solid #f5a0a0;
-    border-radius: 16px;
-    padding: 14px 24px;
-    font-size: 14px;
-    color: #c06060;
-    text-align: center;
-    max-width: 420px;
-  }
 </style>
 </head>
 <body>
@@ -199,63 +156,30 @@
   <img src="S__96526355_0.jpg" alt="謝謝你的分享！">
 </div>
 
-<div class="btn-group">
-  <button class="submit-btn" onclick="submitSurvey()">📩 送出問卷並寄信</button>
-  <div class="success-msg" id="success-msg">
-    ✉️ 已開啟郵件程式，請確認後送出！<br>
-    <span style="font-size:12px;color:#b08080;">（同時已下載本機備份）</span>
-  </div>
+<div class="btn-wrap">
+  <button class="download-btn" onclick="downloadHTML()">⬇ 下載儲存問卷</button>
 </div>
 
 <script>
-const TARGET_EMAIL = 'ting1890@ares.com.tw';
-
-function getAnswers() {
-  return {
+function downloadHTML() {
+  const answers = {
     q1: document.getElementById('q1-box').value,
     q2: document.getElementById('q2-box').value,
     q3: document.getElementById('q3-box').value,
     q4: document.getElementById('q4-box').value,
     q5: document.getElementById('q5-box').value,
   };
-}
 
-const QUESTIONS = [
-  '1. 最近最喜歡做的工作內容是什麼？',
-  '2. 有沒有什麼事情是你想嘗試的？',
-  '3. 有沒有什麼技能是你想培養的？',
-  '4. 工作上目前有沒有卡關或需要協助的地方？',
-  '5. 還有什麼想跟我分享的？',
-];
-
-function submitSurvey() {
-  const answers = getAnswers();
+  const questions = [
+    '1. 最近最喜歡做的工作內容是什麼？',
+    '2. 有沒有什麼事情是你想嘗試的？',
+    '3. 有沒有什麼技能是你想培養的？',
+    '4. 工作上目前有沒有卡關或需要協助的地方？',
+    '5. 還有什麼想跟我分享的？',
+  ];
   const vals = [answers.q1, answers.q2, answers.q3, answers.q4, answers.q5];
-  const time = new Date().toLocaleString('zh-TW');
 
-  // Build plain-text email body
-  let body = '團隊問卷調查回覆\n';
-  body += '填寫時間：' + time + '\n';
-  body += '━━━━━━━━━━━━━━━━━━━━\n\n';
-  QUESTIONS.forEach((q, i) => {
-    body += q + '\n';
-    body += (vals[i].trim() || '（未填寫）') + '\n\n';
-  });
-  body += '━━━━━━━━━━━━━━━━━━━━\n';
-  body += '謝謝你的分享！期待未來一起創造更多美好成果 ♡';
-
-  const subject = encodeURIComponent('【團隊問卷回覆】' + time);
-  const encodedBody = encodeURIComponent(body);
-  window.location.href = 'mailto:' + TARGET_EMAIL + '?subject=' + subject + '&body=' + encodedBody;
-
-  // Also download HTML backup
-  downloadHTML(vals, time);
-
-  document.getElementById('success-msg').style.display = 'block';
-}
-
-function downloadHTML(vals, time) {
-  const rows = QUESTIONS.map((q, i) => `
+  const rows = questions.map((q, i) => `
     <div style="margin-bottom:28px;">
       <div style="font-size:16px;font-weight:700;color:#d47b7b;margin-bottom:8px;">${q}</div>
       <div style="background:#fff0f0;border-radius:12px;padding:14px 16px;font-size:15px;color:#4a3f3f;min-height:60px;white-space:pre-wrap;line-height:1.7;">${escapeHtml(vals[i]) || '<span style="color:#c9a8a8;">（未填寫）</span>'}</div>
@@ -276,7 +200,7 @@ function downloadHTML(vals, time) {
 </head>
 <body>
 <h1>✨ 團隊問卷調查 — 回覆記錄 ✨</h1>
-<p class="sub">填寫時間：${time}</p>
+<p class="sub">填寫時間：${new Date().toLocaleString('zh-TW')}</p>
 ${rows}
 <div class="footer">謝謝你的分享！期待未來一起創造更多美好成果 ♡</div>
 </body>
