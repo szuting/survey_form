@@ -72,19 +72,19 @@
   }
 
   /* Q1: 粉色虛線框，在圖片下半部偏左 */
-  #q1-box { top: 15%; left: 5%; width: 82%; height: 38%; }
+  #q1-box { top: 47%; left: 5%; width: 58%; height: 38%; }
 
   /* Q2: 藍色虛線框，中間偏上 */
   #q2-box { top: 32%; left: 5%; width: 82%; height: 38%; }
 
   /* Q3: 橘色虛線框，中間 */
-  #q3-box { top: 32%; left: 5%; width: 82%; height: 38%; }
+  #q3-box { top: 32%; left: 5%; width: 72%; height: 38%; }
 
   /* Q4: 藍色虛線框，中間 */
-  #q4-box { top: 32%; left: 5%; width: 82%; height: 38%; }
+  #q4-box { top: 32%; left: 5%; width: 82%; height: 42%; }
 
   /* Q5: 粉色虛線框，上方 */
-  #q5-box { top: 30%; left: 5%; width: 82%; height: 10%; }
+  #q5-box { top: 18%; left: 5%; width: 85%; height: 38%; }
 
   .btn-wrap {
     display: flex;
@@ -216,15 +216,15 @@
 </div>
 
 <script>
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwTvSVXFayoRB4hMw2p9w1x5KI27GqW1yHj8GuKHGdC/dev';
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwSrns-RoVPvi7_VrwFgq6rC89GxXm0wCMsqxv0cFtoH3z0MMF-p4THY5Er02Th0eYowg/exec';
 
 // [top%, left%, width%, height%] relative to image dimensions
 const BOX_CONFIG = {
-  'q1-box': [47, 5, 58, 38],
-  'q2-box': [32, 5, 82, 38],
-  'q3-box': [32, 5, 72, 38],
-  'q4-box': [32, 5, 82, 42],
-  'q5-box': [18, 5, 85, 38],
+  'q1-box': [49, 6, 59, 29],
+  'q2-box': [29, 5, 83, 29],
+  'q3-box': [26, 5, 72, 31],
+  'q4-box': [26, 5, 83, 37],
+  'q5-box': [16, 5, 83, 33],
 };
 
 function positionBoxes() {
