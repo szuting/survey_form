@@ -34,7 +34,7 @@
     max-width: 500px;
     margin-bottom: 28px;
     border-radius: 20px;
-    overflow: visible;
+    overflow: hidden;
     box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   }
 
@@ -42,49 +42,40 @@
     display: block;
     width: 100%;
     height: auto;
-    border-radius: 20px;
   }
 
   .text-overlay {
     position: absolute;
-    background: rgba(255,255,255,0.01);
+    background: rgba(255,255,255,0.0);
     border: none;
     outline: none;
     resize: none;
     font-family: 'Noto Sans TC', sans-serif;
-    font-size: 15px;
+    font-size: 16px;
     color: #4a3f3f;
     line-height: 1.6;
-    padding: 10px 14px;
+    padding: 8px 10px;
+    width: 100%;
     cursor: text;
-    box-sizing: border-box;
   }
 
   .text-overlay::placeholder {
-    color: #c9b0b0;
-    font-size: 13px;
+    color: #c9a8a8;
+    font-size: 14px;
   }
 
   .text-overlay:focus {
-    background: rgba(255,235,235,0.5);
-    border-radius: 10px;
+    background: rgba(255,240,240,0.55);
+    border-radius: 8px;
     outline: none;
   }
 
-  /* Q1: 粉色虛線框，在圖片下半部偏左 */
-  #q1-box { top: 47%; left: 5%; width: 58%; height: 38%; }
-
-  /* Q2: 藍色虛線框，中間偏上 */
-  #q2-box { top: 32%; left: 5%; width: 82%; height: 38%; }
-
-  /* Q3: 橘色虛線框，中間 */
-  #q3-box { top: 32%; left: 5%; width: 72%; height: 38%; }
-
-  /* Q4: 藍色虛線框，中間 */
-  #q4-box { top: 32%; left: 5%; width: 82%; height: 42%; }
-
-  /* Q5: 粉色虛線框，上方 */
-  #q5-box { top: 18%; left: 5%; width: 85%; height: 38%; }
+  /* Per-card overlay positions — percentages relative to card image */
+  #q1-box { top: 38%; left: 4%; width: 62%; height: 35%; }
+  #q2-box { top: 30%; left: 5%; width: 88%; height: 30%; }
+  #q3-box { top: 30%; left: 5%; width: 85%; height: 30%; }
+  #q4-box { top: 30%; left: 5%; width: 85%; height: 38%; }
+  #q5-box { top: 22%; left: 5%; width: 88%; height: 35%; }
 
   .btn-wrap {
     display: flex;
@@ -122,49 +113,6 @@
     color: #b08080;
     text-align: center;
     margin-bottom: 20px;
-  }
-
-  .btn-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    margin-top: 8px;
-    margin-bottom: 12px;
-  }
-
-  button.submit-btn {
-    background: #f5a0a0;
-    color: white;
-    border: none;
-    border-radius: 50px;
-    padding: 14px 40px;
-    font-size: 17px;
-    font-family: 'Noto Sans TC', sans-serif;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(245,160,160,0.4);
-    transition: transform 0.15s, box-shadow 0.15s;
-    letter-spacing: 1px;
-  }
-
-  button.submit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(245,160,160,0.5);
-  }
-
-  button.submit-btn:active { transform: scale(0.97); }
-
-  .success-msg {
-    display: none;
-    background: #fff0f5;
-    border: 1.5px solid #f5a0a0;
-    border-radius: 16px;
-    padding: 14px 24px;
-    font-size: 14px;
-    color: #c06060;
-    text-align: center;
-    max-width: 420px;
   }
 </style>
 </head>
@@ -208,82 +156,66 @@
   <img src="S__96526355_0.jpg" alt="謝謝你的分享！">
 </div>
 
-<iframe name="hidden-iframe" style="display:none;"></iframe>
-
-<div class="btn-group">
-  <button class="submit-btn" id="submit-btn" onclick="submitSurvey()">📨 送出問卷</button>
-  <div class="success-msg" id="success-msg">🎉 答案已成功送出到 Google 試算表！謝謝你的分享 ♡</div>
+<div class="btn-wrap">
+  <button class="download-btn" onclick="downloadHTML()">⬇ 下載儲存問卷</button>
 </div>
 
 <script>
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwSrns-RoVPvi7_VrwFgq6rC89GxXm0wCMsqxv0cFtoH3z0MMF-p4THY5Er02Th0eYowg/exec';
+function downloadHTML() {
+  const answers = {
+    q1: document.getElementById('q1-box').value,
+    q2: document.getElementById('q2-box').value,
+    q3: document.getElementById('q3-box').value,
+    q4: document.getElementById('q4-box').value,
+    q5: document.getElementById('q5-box').value,
+  };
 
-// [top%, left%, width%, height%] relative to image dimensions
-const BOX_CONFIG = {
-  'q1-box': [47, 5, 58, 38],
-  'q2-box': [32, 5, 82, 38],
-  'q3-box': [32, 5, 72, 38],
-  'q4-box': [32, 5, 82, 42],
-  'q5-box': [18, 5, 85, 38],
-};
+  const questions = [
+    '1. 最近最喜歡做的工作內容是什麼？',
+    '2. 有沒有什麼事情是你想嘗試的？',
+    '3. 有沒有什麼技能是你想培養的？',
+    '4. 工作上目前有沒有卡關或需要協助的地方？',
+    '5. 還有什麼想跟我分享的？',
+  ];
+  const vals = [answers.q1, answers.q2, answers.q3, answers.q4, answers.q5];
 
-function positionBoxes() {
-  Object.entries(BOX_CONFIG).forEach(([id, [top, left, width, height]]) => {
-    const ta = document.getElementById(id);
-    if (!ta) return;
-    const img = ta.closest('.survey-card').querySelector('img');
-    const h = img.offsetHeight;
-    const w = img.offsetWidth;
-    ta.style.top    = (h * top / 100) + 'px';
-    ta.style.left   = (w * left / 100) + 'px';
-    ta.style.width  = (w * width / 100) + 'px';
-    ta.style.height = (h * height / 100) + 'px';
-  });
+  const rows = questions.map((q, i) => `
+    <div style="margin-bottom:28px;">
+      <div style="font-size:16px;font-weight:700;color:#d47b7b;margin-bottom:8px;">${q}</div>
+      <div style="background:#fff0f0;border-radius:12px;padding:14px 16px;font-size:15px;color:#4a3f3f;min-height:60px;white-space:pre-wrap;line-height:1.7;">${escapeHtml(vals[i]) || '<span style="color:#c9a8a8;">（未填寫）</span>'}</div>
+    </div>
+  `).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>問卷回覆 - 團隊問卷調查</title>
+<style>
+  body{font-family:'Noto Sans TC',sans-serif;background:#fff8f5;padding:32px 20px;max-width:600px;margin:0 auto;}
+  h1{font-size:22px;font-weight:700;color:#d47b7b;text-align:center;margin-bottom:8px;}
+  .sub{font-size:13px;color:#b08080;text-align:center;margin-bottom:32px;}
+  .footer{text-align:center;color:#c9a8a8;font-size:12px;margin-top:40px;}
+</style>
+</head>
+<body>
+<h1>✨ 團隊問卷調查 — 回覆記錄 ✨</h1>
+<p class="sub">填寫時間：${new Date().toLocaleString('zh-TW')}</p>
+${rows}
+<div class="footer">謝謝你的分享！期待未來一起創造更多美好成果 ♡</div>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '問卷回覆.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
-window.addEventListener('load', positionBoxes);
-window.addEventListener('resize', positionBoxes);
-
-function submitSurvey() {
-  const btn = document.getElementById('submit-btn');
-  const successMsg = document.getElementById('success-msg');
-
-  const vals = [
-    document.getElementById('q1-box').value || '（未填寫）',
-    document.getElementById('q2-box').value || '（未填寫）',
-    document.getElementById('q3-box').value || '（未填寫）',
-    document.getElementById('q4-box').value || '（未填寫）',
-    document.getElementById('q5-box').value || '（未填寫）',
-  ];
-  const time = new Date().toLocaleString('zh-TW');
-
-  btn.disabled = true;
-  btn.textContent = '⏳ 送出中…';
-
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = SHEET_URL;
-  form.target = 'hidden-iframe';
-  form.style.display = 'none';
-
-  const fields = { fill_time: time, q1: vals[0], q2: vals[1], q3: vals[2], q4: vals[3], q5: vals[4] };
-  Object.entries(fields).forEach(([key, val]) => {
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = key;
-    input.value = val;
-    form.appendChild(input);
-  });
-
-  document.body.appendChild(form);
-  form.submit();
-  document.body.removeChild(form);
-
-  setTimeout(() => {
-    btn.textContent = '✅ 已送出！';
-    btn.style.background = '#88c98a';
-    successMsg.style.display = 'block';
-  }, 1500);
+function escapeHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 </script>
 </body>
